@@ -42,7 +42,7 @@ public class MediaMuxerWrapper {
     private int mEncoderCount, mStatredCount;
     private boolean mIsStarted;
     private volatile boolean mIsPaused;
-    private MediaEncoder mVideoEncoder, mAudioEncoder;
+    private MediaEncoder mVideoEncoder;
 
     /**
      * Constructor
@@ -70,24 +70,17 @@ public class MediaMuxerWrapper {
     public synchronized void prepare() throws IOException {
         if (mVideoEncoder != null)
             mVideoEncoder.prepare();
-        if (mAudioEncoder != null)
-            mAudioEncoder.prepare();
     }
 
     public synchronized void startRecording() {
         if (mVideoEncoder != null)
             mVideoEncoder.startRecording();
-        if (mAudioEncoder != null)
-            mAudioEncoder.startRecording();
     }
 
     public synchronized void stopRecording() {
         if (mVideoEncoder != null)
             mVideoEncoder.stopRecording();
         mVideoEncoder = null;
-        if (mAudioEncoder != null)
-            mAudioEncoder.stopRecording();
-        mAudioEncoder = null;
     }
 
     public synchronized boolean isStarted() {
@@ -98,15 +91,11 @@ public class MediaMuxerWrapper {
         mIsPaused = true;
         if (mVideoEncoder != null)
             mVideoEncoder.pauseRecording();
-        if (mAudioEncoder != null)
-            mAudioEncoder.pauseRecording();
     }
 
     public synchronized void resumeRecording() {
         if (mVideoEncoder != null)
             mVideoEncoder.resumeRecording();
-        if (mAudioEncoder != null)
-            mAudioEncoder.resumeRecording();
         mIsPaused = false;
     }
 
@@ -129,7 +118,7 @@ public class MediaMuxerWrapper {
             mVideoEncoder = encoder;
         } else
             throw new IllegalArgumentException("unsupported encoder");
-        mEncoderCount = (mVideoEncoder != null ? 1 : 0) + (mAudioEncoder != null ? 1 : 0);
+        mEncoderCount = (mVideoEncoder != null ? 1 : 0);
     }
 
     /**
@@ -194,6 +183,4 @@ public class MediaMuxerWrapper {
             mMediaMuxer.writeSampleData(trackIndex, byteBuf, bufferInfo);
     }
 
-//**********************************************************************
-//**********************************************************************
 }
