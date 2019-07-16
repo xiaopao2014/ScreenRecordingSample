@@ -30,8 +30,6 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.serenegiant.utils.FileUtils;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -55,7 +53,7 @@ public class MediaMuxerWrapper {
 		String ext = _ext;
 		if (TextUtils.isEmpty(ext)) ext = ".mp4";
 		try {
-			mOutputPath = FileUtils.getCaptureFile(context, Environment.DIRECTORY_MOVIES, ext, 0).toString();
+			mOutputPath = Environment.getExternalStorageDirectory() + "/" + System.currentTimeMillis() + ".mp4";
 		} catch (final NullPointerException e) {
 			throw new RuntimeException("This app has no permission of writing external storage");
 		}
