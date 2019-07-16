@@ -31,7 +31,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class MediaMuxerWrapper {
+public class MediaMuxerWrapper implements ScreenDataConsumer {
     private static final boolean DEBUG = false;    // TODO set false on release
     private static final String TAG = MediaMuxerWrapper.class.getSimpleName();
 
@@ -59,9 +59,6 @@ public class MediaMuxerWrapper {
         mIsStarted = false;
     }
 
-    public String getOutputPath() {
-        return mOutputPath;
-    }
 
     public synchronized void prepare() throws IOException {
         if (mVideoEncoder != null)
@@ -107,7 +104,7 @@ public class MediaMuxerWrapper {
      *
      * @param encoder instance of MediaVideoEncoderBase
      */
-    /*package*/ void addEncoder(final MediaEncoder encoder) {
+    public void addEncoder(final MediaEncoder encoder) {
         if (encoder instanceof MediaVideoEncoderBase) {
             if (mVideoEncoder != null)
                 throw new IllegalArgumentException("Video encoder already added.");
@@ -138,8 +135,7 @@ public class MediaMuxerWrapper {
     /**
      * request stop recording from encoder when encoder received EOS
      */
-    /*package*/
-    synchronized void stop() {
+    public synchronized void stop() {
         if (DEBUG) Log.v(TAG, "stop:mStatredCount=" + mStatredCount);
         mStatredCount--;
         if ((mEncoderCount > 0) && (mStatredCount <= 0)) {
@@ -150,14 +146,31 @@ public class MediaMuxerWrapper {
         }
     }
 
+    @Override
+    public int onOutputFormatChange(MediaFormat mediaFormat) {
+
+        int index = mMediaMuxer.addTrack(mediaFormat);
+        if (!start()) {
+            // we should wait until muxer is ready
+            synchronized (this) {
+                while (!this.isStarted())
+                    try {
+                        this.wait(100);
+                    } catch (final InterruptedException e) {
+                        break;
+                    }
+            }
+        }
+        return index;
+    }
+
     /**
      * assign encoder to muxer
      *
      * @param format
      * @return minus value indicate error
      */
-    /*package*/
-    synchronized int addTrack(final MediaFormat format) {
+    private synchronized int addTrack(final MediaFormat format) {
         if (mIsStarted)
             throw new IllegalStateException("muxer already started");
         final int trackIx = mMediaMuxer.addTrack(format);
@@ -173,10 +186,13 @@ public class MediaMuxerWrapper {
      * @param byteBuf
      * @param bufferInfo
      */
-    /*package*/
-    synchronized void writeSampleData(final int trackIndex, final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo) {
+    private void writeSampleData(final int trackIndex, final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo) {
         if (mStatredCount > 0)
             mMediaMuxer.writeSampleData(trackIndex, byteBuf, bufferInfo);
     }
 
+    @Override
+    public void onDataAvailable(int trackIndex, ByteBuffer byteBuf, MediaCodec.BufferInfo bufferInfo) {
+        writeSampleData(trackIndex, byteBuf, bufferInfo);
+    }
 }

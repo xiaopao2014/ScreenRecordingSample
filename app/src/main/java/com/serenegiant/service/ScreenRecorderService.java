@@ -169,12 +169,14 @@ public class ScreenRecorderService extends Service {
                     if (DEBUG)
                         Log.v(TAG, String.format("startRecording:(%d,%d)(%d,%d)", metrics.widthPixels, metrics.heightPixels, width, height));
                     try {
-                        sMuxer = new MediaMuxerWrapper();    // if you record audio only, ".m4a" is also OK.
+                        sMuxer = new MediaMuxerWrapper();// if you record audio only, ".m4a" is also OK.
+                        MediaScreenEncoder encoder;
                         if (true) {
                             // for screen capturing
-                            new MediaScreenEncoder(sMuxer, mMediaEncoderListener,
+                            encoder = new MediaScreenEncoder(sMuxer, mMediaEncoderListener,
                                     projection, width, height, metrics.densityDpi, 800 * 1024, 30);
                         }
+                        sMuxer.addEncoder(encoder);
                         sMuxer.prepare();
                         sMuxer.startRecording();
                     } catch (final IOException e) {
