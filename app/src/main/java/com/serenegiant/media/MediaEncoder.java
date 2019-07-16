@@ -37,8 +37,6 @@ public abstract class MediaEncoder implements Runnable {
     private static final String TAG = MediaEncoder.class.getSimpleName();
 
     protected static final int TIMEOUT_USEC = 10000;    // 10[msec]
-    protected static final int MSG_FRAME_AVAILABLE = 1;
-    protected static final int MSG_STOP_RECORDING = 9;
 
     public interface MediaEncoderListener {
         public void onPrepared(MediaEncoder encoder);
@@ -107,10 +105,6 @@ public abstract class MediaEncoder implements Runnable {
         }
     }
 
-    public String getOutputPath() {
-        final MediaMuxerWrapper muxer = mWeakMuxer.get();
-        return muxer != null ? muxer.getOutputPath() : null;
-    }
 
     /**
      * the method to indicate frame data is soon available or already available

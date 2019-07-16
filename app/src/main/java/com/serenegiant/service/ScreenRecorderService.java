@@ -67,7 +67,7 @@ public class ScreenRecorderService extends Service {
     private static final int NOTIFICATION = R.string.app_name;
 
     private static final Object sSync = new Object();
-    private static MediaMuxerWrapper sMuxer;
+    private MediaMuxerWrapper sMuxer;
 
     private MediaProjectionManager mMediaProjectionManager;
     private NotificationManager mNotificationManager;
