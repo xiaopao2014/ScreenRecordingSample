@@ -22,8 +22,6 @@ package com.serenegiant.service;
  * All files in the folder are under this Apache License, Version 2.0.
 */
 
-import java.io.IOException;
-
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -48,6 +46,8 @@ import com.serenegiant.screenrecordingsample.MainActivity;
 import com.serenegiant.screenrecordingsample.R;
 import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.FileUtils;
+
+import java.io.IOException;
 
 public class ScreenRecorderService extends Service {
 	private static final boolean DEBUG = false;

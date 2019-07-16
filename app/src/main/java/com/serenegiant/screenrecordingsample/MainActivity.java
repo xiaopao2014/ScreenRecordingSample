@@ -22,8 +22,6 @@ package com.serenegiant.screenrecordingsample;
  * All files in the folder are under this Apache License, Version 2.0.
 */
 
-import java.lang.ref.WeakReference;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -45,6 +43,8 @@ import com.serenegiant.dialog.MessageDialogFragment;
 import com.serenegiant.service.ScreenRecorderService;
 import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.PermissionCheck;
+
+import java.lang.ref.WeakReference;
 
 public final class MainActivity extends Activity
 	implements MessageDialogFragment.MessageDialogListener {
