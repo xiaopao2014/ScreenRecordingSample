@@ -192,38 +192,24 @@ public class MediaScreenEncoder extends MediaVideoEncoderBase {
 		private final OnFrameAvailableListener mOnFrameAvailableListener = new OnFrameAvailableListener() {
 			@Override
 			public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
-//				if (DEBUG) Log.v(TAG, "onFrameAvailable:mIsRecording=" + mIsRecording);
-				if (mIsRecording) {
-					synchronized (mSync) {
-						requestDraw = true;
-						mSync.notifyAll();
-					}
-				}
+
 			}
 		};
 
 		private final Runnable mDrawTask = new Runnable() {
 			@Override
 			public void run() {
-//				if (DEBUG) Log.v(TAG, "draw:");
-				boolean local_request_draw;
+
 				synchronized (mSync) {
-					local_request_draw = requestDraw;
-					if (!requestDraw) {
-						try {
-							mSync.wait(intervals);
-							local_request_draw = requestDraw;
-							requestDraw = false;
-						} catch (final InterruptedException e) {
-							return;
-						}
+					try {
+						mSync.wait(intervals);
+					} catch (final InterruptedException e) {
+						return;
 					}
 				}
 				if (mIsRecording) {
-					if (local_request_draw) {
-						mSourceTexture.updateTexImage();
-						mSourceTexture.getTransformMatrix(mTexMatrix);
-					}
+					mSourceTexture.updateTexImage();
+					mSourceTexture.getTransformMatrix(mTexMatrix);
 					// SurfaceTextureで受け取った画像をMediaCodecの入力用Surfaceへ描画する
 					mEncoderSurface.makeCurrent();
 					mDrawer.draw(mTexId, mTexMatrix, 0);
