@@ -104,9 +104,9 @@ public class MediaScreenEncoder extends MediaVideoEncoderBase {
     private final Object mSync = new Object();
     private volatile boolean mIsRecording;
 
-    private final DrawTask mScreenCaptureTask = new DrawTask(null, 0);
+    private final ScreenCaptureTask mScreenCaptureTask = new ScreenCaptureTask(null, 0);
 
-    private final class DrawTask extends EglTask {
+    private final class ScreenCaptureTask extends EglTask {
         private VirtualDisplay display;
         private long intervals;
         private int mTexId;
@@ -116,7 +116,7 @@ public class MediaScreenEncoder extends MediaVideoEncoderBase {
         private GLDrawer2D mDrawer;
         private final float[] mTexMatrix = new float[16];
 
-        public DrawTask(final EGLBase.IContext sharedContext, final int flags) {
+        public ScreenCaptureTask(final EGLBase.IContext sharedContext, final int flags) {
             super(sharedContext, flags);
         }
 
