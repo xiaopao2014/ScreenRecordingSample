@@ -38,7 +38,6 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
-import com.serenegiant.media.MediaAudioEncoder;
 import com.serenegiant.media.MediaEncoder;
 import com.serenegiant.media.MediaMuxerWrapper;
 import com.serenegiant.media.MediaScreenEncoder;
@@ -180,10 +179,6 @@ public class ScreenRecorderService extends Service {
 							// for screen capturing
 							new MediaScreenEncoder(sMuxer, mMediaEncoderListener,
 								projection, width, height, metrics.densityDpi, 800 * 1024, 15);
-						}
-						if (true) {
-							// for audio capturing
-							new MediaAudioEncoder(sMuxer, mMediaEncoderListener);
 						}
 						sMuxer.prepare();
 						sMuxer.startRecording();

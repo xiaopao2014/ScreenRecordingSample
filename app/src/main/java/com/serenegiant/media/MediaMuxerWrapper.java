@@ -124,10 +124,6 @@ public class MediaMuxerWrapper {
 			if (mVideoEncoder != null)
 				throw new IllegalArgumentException("Video encoder already added.");
 			mVideoEncoder = encoder;
-		} else if (encoder instanceof MediaAudioEncoder) {
-			if (mAudioEncoder != null)
-				throw new IllegalArgumentException("Video encoder already added.");
-			mAudioEncoder = encoder;
 		} else
 			throw new IllegalArgumentException("unsupported encoder");
 		mEncoderCount = (mVideoEncoder != null ? 1 : 0) + (mAudioEncoder != null ? 1 : 0);
