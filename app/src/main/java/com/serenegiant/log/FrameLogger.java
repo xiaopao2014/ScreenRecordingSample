@@ -6,6 +6,13 @@ import java.util.HashMap;
 
 public class FrameLogger {
 
+    private static FrameLogger frameLogger = new FrameLogger();
+
+
+    public static FrameLogger getInstance() {
+        return frameLogger;
+    }
+
     static class TagFrame {
         int count;
         long startTime;

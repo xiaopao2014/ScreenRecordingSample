@@ -178,7 +178,7 @@ public class ScreenRecorderService extends Service {
 						if (true) {
 							// for screen capturing
 							new MediaScreenEncoder(sMuxer, mMediaEncoderListener,
-								projection, width, height, metrics.densityDpi, 800 * 1024, 60);
+								projection, width, height, metrics.densityDpi, 800 * 1024, 30);
 						}
 						sMuxer.prepare();
 						sMuxer.startRecording();

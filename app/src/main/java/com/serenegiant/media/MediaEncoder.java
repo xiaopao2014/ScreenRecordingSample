@@ -26,6 +26,8 @@ import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.util.Log;
 
+import com.serenegiant.log.FrameLogger;
+
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -395,6 +397,7 @@ LOOP:	while (mIsCapturing) {
                     // write encoded data to muxer(need to adjust presentationTimeUs.
 					if (!mRequestPause) {
 	                   	mBufferInfo.presentationTimeUs = getPTSUs();
+						FrameLogger.getInstance().frame("muxer");
 	                   	muxer.writeSampleData(mTrackIndex, encodedData, mBufferInfo);
 						prevOutputPTSUs = mBufferInfo.presentationTimeUs;
 					}
