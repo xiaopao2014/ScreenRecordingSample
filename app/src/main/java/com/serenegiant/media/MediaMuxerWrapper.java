@@ -22,12 +22,10 @@ package com.serenegiant.media;
  * All files in the folder are under this Apache License, Version 2.0.
  */
 
-import android.content.Context;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.os.Environment;
-import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.IOException;
@@ -50,9 +48,7 @@ public class MediaMuxerWrapper {
      * @param _ext extension of output file
      * @throws IOException
      */
-    public MediaMuxerWrapper(final Context context, final String _ext) throws IOException {
-        String ext = _ext;
-        if (TextUtils.isEmpty(ext)) ext = ".mp4";
+    public MediaMuxerWrapper() throws IOException {
         try {
             mOutputPath = Environment.getExternalStorageDirectory() + "/" + System.currentTimeMillis() + ".mp4";
         } catch (final NullPointerException e) {
