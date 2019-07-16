@@ -45,8 +45,6 @@ public class MediaScreenEncoder extends MediaVideoEncoderBase {
 	private static final String TAG = MediaScreenEncoder.class.getSimpleName();
 
 	private static final String MIME_TYPE = MediaFormat.MIMETYPE_VIDEO_AVC;
-	// parameters for recording
-    private static final int FRAME_RATE = 25;
 
 	private MediaProjection mMediaProjection;
     private final int mDensity;
@@ -106,7 +104,6 @@ public class MediaScreenEncoder extends MediaVideoEncoderBase {
 	private final Object mSync = new Object();
 	private volatile boolean mIsRecording;
 
-	private boolean requestDraw;
 	private final DrawTask mScreenCaptureTask = new DrawTask(null, 0);
 
 	private final class DrawTask extends EglTask {
