@@ -24,8 +24,8 @@ package com.serenegiant.service;
 
 import android.annotation.TargetApi;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
@@ -39,8 +39,8 @@ import android.util.Log;
 import com.serenegiant.media.MediaEncoder;
 import com.serenegiant.media.MediaMuxerWrapper;
 import com.serenegiant.media.MediaScreenEncoder;
-import com.serenegiant.screenrecordingsample.MainActivity;
 import com.serenegiant.screenrecordingsample.R;
+import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.FileUtils;
 
 import java.io.IOException;
@@ -76,6 +76,14 @@ public class ScreenRecorderService extends Service {
     public void onDestroy() {
         if (DEBUG) Log.v(TAG, "onDestroy:");
         super.onDestroy();
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        if (BuildCheck.isLollipop())
+            mMediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+
     }
 
     @Nullable
