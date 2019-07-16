@@ -200,13 +200,7 @@ public class MediaScreenEncoder extends MediaVideoEncoderBase {
 			@Override
 			public void run() {
 
-				synchronized (mSync) {
-					try {
-						mSync.wait(intervals);
-					} catch (final InterruptedException e) {
-						return;
-					}
-				}
+				long startDraw = System.currentTimeMillis();
 				if (mIsRecording) {
 					mSourceTexture.updateTexImage();
 					mSourceTexture.getTransformMatrix(mTexMatrix);
@@ -219,6 +213,14 @@ public class MediaScreenEncoder extends MediaVideoEncoderBase {
 					GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 					GLES20.glFlush();
 					frameAvailableSoon();
+
+					synchronized (mSync) {
+						try {
+							mSync.wait(intervals - (System.currentTimeMillis() - startDraw));
+						} catch (final InterruptedException e) {
+							return;
+						}
+					}
 					queueEvent(this);
 				} else {
 					releaseSelf();
