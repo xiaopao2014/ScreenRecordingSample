@@ -23,11 +23,9 @@ package com.serenegiant.service;
  */
 
 import android.annotation.TargetApi;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
@@ -43,7 +41,6 @@ import com.serenegiant.media.MediaMuxerWrapper;
 import com.serenegiant.media.MediaScreenEncoder;
 import com.serenegiant.screenrecordingsample.MainActivity;
 import com.serenegiant.screenrecordingsample.R;
-import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.FileUtils;
 
 import java.io.IOException;
@@ -74,20 +71,6 @@ public class ScreenRecorderService extends Service {
 
     private MediaProjectionManager mMediaProjectionManager;
     private NotificationManager mNotificationManager;
-
-    public ScreenRecorderService() {
-        super();
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        if (DEBUG) Log.v(TAG, "onCreate:");
-        if (BuildCheck.isLollipop())
-            mMediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
-        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        showNotification(TAG);
-    }
 
     @Override
     public void onDestroy() {
@@ -245,34 +228,5 @@ public class ScreenRecorderService extends Service {
         }
     };
 
-//================================================================================
-
-    /**
-     * helper method to show/change message on notification area
-     * and set this service as foreground service to keep alive as possible as this can.
-     *
-     * @param text
-     */
-    private void showNotification(final CharSequence text) {
-        if (DEBUG) Log.v(TAG, "showNotification:" + text);
-        // Set the info for the views that show in the notification panel.
-        final Notification notification = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.ic_launcher)  // the status icon
-                .setTicker(text)  // the status text
-                .setWhen(System.currentTimeMillis())  // the time stamp
-                .setContentTitle(getText(R.string.app_name))  // the label of the entry
-                .setContentText(text)  // the contents of the entry
-                .setContentIntent(createPendingIntent())  // The intent to send when the entry is clicked
-                .build();
-
-        startForeground(NOTIFICATION, notification);
-        // Send the notification.
-        mNotificationManager.notify(NOTIFICATION, notification);
-    }
-
-    protected PendingIntent createPendingIntent() {
-        FileUtils.DIR_NAME = APP_DIR_NAME;
-        return PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
-    }
 
 }
