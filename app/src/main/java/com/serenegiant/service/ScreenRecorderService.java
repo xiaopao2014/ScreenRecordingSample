@@ -149,32 +149,14 @@ public class ScreenRecorderService extends Service {
                 final MediaProjection projection = mMediaProjectionManager.getMediaProjection(resultCode, intent);
                 if (projection != null) {
                     final DisplayMetrics metrics = getResources().getDisplayMetrics();
-                    int width = metrics.widthPixels;
-                    int height = metrics.heightPixels;
-                    if (width > height) {
-                        // 横長
-                        final float scale_x = width / 1920f;
-                        final float scale_y = height / 1080f;
-                        final float scale = Math.max(scale_x, scale_y);
-                        width = (int) (width / scale);
-                        height = (int) (height / scale);
-                    } else {
-                        // 縦長
-                        final float scale_x = width / 1080f;
-                        final float scale_y = height / 1920f;
-                        final float scale = Math.max(scale_x, scale_y);
-                        width = (int) (width / scale);
-                        height = (int) (height / scale);
-                    }
-                    if (DEBUG)
-                        Log.v(TAG, String.format("startRecording:(%d,%d)(%d,%d)", metrics.widthPixels, metrics.heightPixels, width, height));
+
                     try {
                         sMuxer = new MediaMuxerWrapper();// if you record audio only, ".m4a" is also OK.
                         MediaScreenEncoder encoder;
                         if (true) {
                             // for screen capturing
                             encoder = new MediaScreenEncoder(sMuxer, mMediaEncoderListener,
-                                    projection, width, height, metrics.densityDpi, 800 * 1024, 30);
+                                    projection, metrics.widthPixels, metrics.heightPixels, metrics.densityDpi, 800 * 1024, 30);
                         }
                         sMuxer.addEncoder(encoder);
                         sMuxer.prepare();
