@@ -177,10 +177,10 @@ public abstract class MediaEncoder implements Runnable {
      * this method should be implemented in sub class, so set this as abstract method
      * @throws IOException
      */
-    /*package*/
-    abstract void prepare() throws IOException;
 
-    /*package*/ void startRecording() {
+    public abstract void prepare() throws IOException;
+
+    public void startRecording() {
         if (DEBUG) Log.v(TAG, "startRecording");
         synchronized (mSync) {
             mIsCapturing = true;
@@ -193,7 +193,7 @@ public abstract class MediaEncoder implements Runnable {
     /**
      * the method to request stop encoding
      */
-    /*package*/ void stopRecording() {
+    public void stopRecording() {
         if (DEBUG) Log.v(TAG, "stopRecording");
         synchronized (mSync) {
             if (!mIsCapturing || mRequestStop) {
@@ -375,7 +375,7 @@ public abstract class MediaEncoder implements Runnable {
                     if (!mRequestPause) {
                         mBufferInfo.presentationTimeUs = getPTSUs();
                         FrameLogger.getInstance().frame("muxer");
-                        muxer.onDataAvailable(mTrackIndex, encodedData, mBufferInfo);
+                        muxer.onDataAvailable(mTrackIndex,encoderStatus, encodedData, mBufferInfo);
                         prevOutputPTSUs = mBufferInfo.presentationTimeUs;
                     }
                 }

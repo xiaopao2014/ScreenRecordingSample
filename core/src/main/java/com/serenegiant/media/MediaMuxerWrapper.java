@@ -192,7 +192,7 @@ public class MediaMuxerWrapper implements ScreenDataConsumer {
     }
 
     @Override
-    public void onDataAvailable(int trackIndex, ByteBuffer byteBuf, MediaCodec.BufferInfo bufferInfo) {
+    public void onDataAvailable(int trackIndex, int byteBufIndex,ByteBuffer byteBuf, MediaCodec.BufferInfo bufferInfo) {
         writeSampleData(trackIndex, byteBuf, bufferInfo);
     }
 }

@@ -42,7 +42,7 @@ public abstract class MediaVideoEncoderBase extends MediaEncoder {
     protected final int mWidth;
     protected final int mHeight;
 
-    public MediaVideoEncoderBase(final MediaMuxerWrapper muxer, final MediaEncoderListener listener, final int width, final int height) {
+    public MediaVideoEncoderBase(final ScreenDataConsumer muxer, final MediaEncoderListener listener, final int width, final int height) {
         super(muxer, listener);
         mWidth = width;
         mHeight = height;

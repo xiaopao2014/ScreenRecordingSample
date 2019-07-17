@@ -36,10 +36,10 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
+import com.serenegiant.core.R;
 import com.serenegiant.media.MediaEncoder;
 import com.serenegiant.media.MediaMuxerWrapper;
 import com.serenegiant.media.MediaScreenEncoder;
-import com.serenegiant.screenrecordingsample.R;
 import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.FileUtils;
 

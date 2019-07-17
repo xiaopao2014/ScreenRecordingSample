@@ -52,7 +52,7 @@ public class MediaScreenEncoder extends MediaVideoEncoderBase {
     private Surface mSurface;
     private final Handler mHandler;
 
-    public MediaScreenEncoder(final MediaMuxerWrapper muxer, final MediaEncoderListener listener,
+    public MediaScreenEncoder(final ScreenDataConsumer muxer, final MediaEncoderListener listener,
                               final MediaProjection projection, final int width, final int height, final int density,
                               final int _bitrate, final int _fps) {
 
@@ -73,7 +73,7 @@ public class MediaScreenEncoder extends MediaVideoEncoderBase {
     }
 
     @Override
-    void prepare() throws IOException {
+    public void prepare() throws IOException {
         if (DEBUG) Log.i(TAG, "prepare: ");
         mSurface = prepare_surface_encoder(MIME_TYPE, fps, bitrate);
         mMediaCodec.start();
@@ -91,7 +91,7 @@ public class MediaScreenEncoder extends MediaVideoEncoderBase {
 
 
     @Override
-    void stopRecording() {
+    public void stopRecording() {
         if (DEBUG) Log.v(TAG, "stopRecording:");
         synchronized (mSync) {
             mIsRecording = false;
