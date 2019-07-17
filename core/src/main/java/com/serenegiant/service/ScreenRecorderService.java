@@ -37,8 +37,10 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.serenegiant.core.R;
+import com.serenegiant.media.BaseDataListener;
 import com.serenegiant.media.MediaEncoder;
-import com.serenegiant.media.MediaMuxerWrapper;
+import com.serenegiant.media.saver.H264DataSaver;
+import com.serenegiant.media.saver.MP4DataSaver;
 import com.serenegiant.media.MediaScreenEncoder;
 import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.FileUtils;
@@ -67,7 +69,7 @@ public class ScreenRecorderService extends Service {
     private static final int NOTIFICATION = R.string.app_name;
 
     private static final Object sSync = new Object();
-    private MediaMuxerWrapper sMuxer;
+    private BaseDataListener listener;
 
     private MediaProjectionManager mMediaProjectionManager;
     private NotificationManager mNotificationManager;
@@ -121,8 +123,8 @@ public class ScreenRecorderService extends Service {
     private boolean updateStatus() {
         final boolean isRecording, isPausing;
         synchronized (sSync) {
-            isRecording = (sMuxer != null);
-            isPausing = isRecording && sMuxer.isPaused();
+            isRecording = (listener != null);
+            isPausing = isRecording && listener.isPaused();
         }
         final Intent result = new Intent();
         result.setAction(ACTION_QUERY_STATUS_RESULT);
@@ -141,9 +143,9 @@ public class ScreenRecorderService extends Service {
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void startScreenRecord(final Intent intent) {
-        if (DEBUG) Log.v(TAG, "startScreenRecord:sMuxer=" + sMuxer);
+        if (DEBUG) Log.v(TAG, "startScreenRecord:listener=" + listener);
         synchronized (sSync) {
-            if (sMuxer == null) {
+            if (listener == null) {
                 final int resultCode = intent.getIntExtra(EXTRA_RESULT_CODE, 0);
                 // get MediaProjection
                 final MediaProjection projection = mMediaProjectionManager.getMediaProjection(resultCode, intent);
@@ -151,16 +153,16 @@ public class ScreenRecorderService extends Service {
                     final DisplayMetrics metrics = getResources().getDisplayMetrics();
 
                     try {
-                        sMuxer = new MediaMuxerWrapper();// if you record audio only, ".m4a" is also OK.
+                        listener = new MP4DataSaver();// if you record audio only, ".m4a" is also OK.
                         MediaScreenEncoder encoder;
                         if (true) {
                             // for screen capturing
-                            encoder = new MediaScreenEncoder(sMuxer, mMediaEncoderListener,
+                            encoder = new MediaScreenEncoder(listener, mMediaEncoderListener,
                                     projection, metrics.widthPixels, metrics.heightPixels, metrics.densityDpi, 800 * 1024, 30);
                         }
-                        sMuxer.addEncoder(encoder);
-                        sMuxer.prepare();
-                        sMuxer.startRecording();
+                        listener.addEncoder(encoder);
+                        listener.prepare();
+                        listener.startRecording();
                     } catch (final IOException e) {
                         Log.e(TAG, "startScreenRecord:", e);
                     }
@@ -173,11 +175,11 @@ public class ScreenRecorderService extends Service {
      * stop screen recording
      */
     private void stopScreenRecord() {
-        if (DEBUG) Log.v(TAG, "stopScreenRecord:sMuxer=" + sMuxer);
+        if (DEBUG) Log.v(TAG, "stopScreenRecord:listener=" + listener);
         synchronized (sSync) {
-            if (sMuxer != null) {
-                sMuxer.stopRecording();
-                sMuxer = null;
+            if (listener != null) {
+                listener.stopRecording();
+                listener = null;
                 // you should not wait here
             }
         }
@@ -191,16 +193,16 @@ public class ScreenRecorderService extends Service {
 
     private void pauseScreenRecord() {
         synchronized (sSync) {
-            if (sMuxer != null) {
-                sMuxer.pauseRecording();
+            if (listener != null) {
+                listener.pauseRecording();
             }
         }
     }
 
     private void resumeScreenRecord() {
         synchronized (sSync) {
-            if (sMuxer != null) {
-                sMuxer.resumeRecording();
+            if (listener != null) {
+                listener.resumeRecording();
             }
         }
     }

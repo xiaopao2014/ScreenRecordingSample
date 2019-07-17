@@ -52,7 +52,7 @@ public class MediaScreenEncoder extends MediaVideoEncoderBase {
     private Surface mSurface;
     private final Handler mHandler;
 
-    public MediaScreenEncoder(final ScreenDataConsumer muxer, final MediaEncoderListener listener,
+    public MediaScreenEncoder(final DataListener muxer, final MediaEncoderListener listener,
                               final MediaProjection projection, final int width, final int height, final int density,
                               final int _bitrate, final int _fps) {
 

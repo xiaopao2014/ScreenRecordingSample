@@ -76,7 +76,7 @@ public abstract class MediaEncoder implements Runnable {
     /**
      * Weak refarence of MediaMuxerWarapper instance
      */
-    protected final WeakReference<ScreenDataConsumer> mWeakMuxer;
+    protected final WeakReference<DataListener> mWeakMuxer;
     /**
      * BufferInfo instance for dequeuing
      */
@@ -87,10 +87,10 @@ public abstract class MediaEncoder implements Runnable {
     protected volatile boolean mRequestPause;
     private long mLastPausedTimeUs;
 
-    public MediaEncoder(final ScreenDataConsumer muxer, final MediaEncoderListener listener) {
+    public MediaEncoder(final DataListener muxer, final MediaEncoderListener listener) {
         if (listener == null) throw new NullPointerException("MediaEncoderListener is null");
-        if (muxer == null) throw new NullPointerException("MediaMuxerWrapper is null");
-        mWeakMuxer = new WeakReference<ScreenDataConsumer>(muxer);
+        if (muxer == null) throw new NullPointerException("MP4DataSaver is null");
+        mWeakMuxer = new WeakReference<DataListener>(muxer);
         mListener = listener;
         synchronized (mSync) {
             // create BufferInfo here for effectiveness(to reduce GC)
@@ -256,15 +256,6 @@ public abstract class MediaEncoder implements Runnable {
                 Log.e(TAG, "failed releasing MediaCodec", e);
             }
         }
-        final ScreenDataConsumer muxer = mWeakMuxer != null ? mWeakMuxer.get() : null;
-        if (muxer != null) {
-            try {
-                muxer.stop();
-            } catch (final Exception e) {
-                Log.e(TAG, "failed stopping muxer", e);
-            }
-        }
-
         mBufferInfo = null;
     }
 
@@ -322,7 +313,7 @@ public abstract class MediaEncoder implements Runnable {
         if (mMediaCodec == null) return;
         ByteBuffer[] encoderOutputBuffers = mMediaCodec.getOutputBuffers();
         int encoderStatus, count = 0;
-        final ScreenDataConsumer muxer = mWeakMuxer.get();
+        final DataListener muxer = mWeakMuxer.get();
         if (muxer == null) {
 //        	throw new NullPointerException("muxer is unexpectedly null");
             Log.w(TAG, "muxer is unexpectedly null");
