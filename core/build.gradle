@@ -25,5 +25,6 @@ android {
 dependencies {
     implementation fileTree(dir: new File(buildDir, 'libs'), include: '*.jar')
     implementation "com.android.support:support-v4:${supportLibVersion}"
-    implementation ("com.serenegiant:common:${commonLibVersion}")
+
+    implementation project(':common')
 }

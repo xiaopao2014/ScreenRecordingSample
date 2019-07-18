@@ -25,7 +25,8 @@ android {
 
 dependencies {
     implementation project(':core')
-    implementation ("com.serenegiant:common:${commonLibVersion}")
+
+    implementation project(':common')
 }
 repositories {
     mavenLocal()
