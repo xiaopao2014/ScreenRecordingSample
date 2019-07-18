@@ -3,6 +3,7 @@ package com.serenegiant.media.saver;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Environment;
+import android.util.Log;
 
 import com.serenegiant.media.BaseDataListener;
 
@@ -33,6 +34,22 @@ public class H264DataSaver extends BaseDataListener {
         }
     }
 
+    /**
+     * 方法三：
+     * byte[] to hex string
+     *
+     * @param bytes
+     * @return
+     */
+    public static String bytesToHexFun3(byte[] bytes) {
+        StringBuffer buf = new StringBuffer();
+        for(byte b : bytes) { // 使用String的format方法进行转换
+            buf.append(String.format(" 0x%02x ", new Integer(b & 0xff)));
+        }
+
+        return buf.toString();
+    }
+
 
     /**
      * @author linliangbin
@@ -41,11 +58,15 @@ public class H264DataSaver extends BaseDataListener {
      * @update
      * @create 2019/7/16 18:41
      **/
-    private void writeFile(OutputStream out, ByteBuffer sourceData) throws IOException {
+    public void writeFile(OutputStream out, ByteBuffer sourceData) throws IOException {
 
         byte[] outData = new byte[sourceData.limit()];
         sourceData.get(outData);
 
+//        Log.i("MediaEncoder", "length:" + outData.length+",date:" + bytesToHexFun3(outData));
+        if(out == null){
+            return;
+        }
         out.write(outData, 0, outData.length);
         out.flush();
 
