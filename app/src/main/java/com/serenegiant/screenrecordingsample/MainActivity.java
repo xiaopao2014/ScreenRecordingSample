@@ -32,7 +32,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -230,7 +229,7 @@ public final class MainActivity extends Activity
      * @param grantResults
      */
     @Override
-    public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
+    public void onRequestPermissionsResult(final int requestCode,  final String[] permissions,  final int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);    // 何もしてないけど一応呼んどく
         final int n = Math.min(permissions.length, grantResults.length);
         for (int i = 0; i < n; i++) {
