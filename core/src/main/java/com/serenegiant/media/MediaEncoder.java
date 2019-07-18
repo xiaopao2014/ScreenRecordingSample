@@ -311,7 +311,6 @@ public abstract class MediaEncoder implements Runnable {
      */
     protected void drain() {
         if (mMediaCodec == null) return;
-        ByteBuffer[] encoderOutputBuffers = mMediaCodec.getOutputBuffers();
         int encoderStatus, count = 0;
         final DataListener muxer = mWeakMuxer.get();
         if (muxer == null) {
@@ -332,7 +331,6 @@ public abstract class MediaEncoder implements Runnable {
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
                 if (DEBUG) Log.v(TAG, "INFO_OUTPUT_BUFFERS_CHANGED");
                 // this should not come when encoding
-                encoderOutputBuffers = mMediaCodec.getOutputBuffers();
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 if (DEBUG) Log.v(TAG, "INFO_OUTPUT_FORMAT_CHANGED");
                 // get output format from codec and pass them to muxer
@@ -345,7 +343,7 @@ public abstract class MediaEncoder implements Runnable {
                 if (DEBUG)
                     Log.w(TAG, "drain:unexpected result from encoder#dequeueOutputBuffer: " + encoderStatus);
             } else {
-                final ByteBuffer encodedData = encoderOutputBuffers[encoderStatus];
+                final ByteBuffer encodedData = mMediaCodec.getOutputBuffer(encoderStatus);
                 if (encodedData == null) {
                     // this never should come...may be a MediaCodec internal error
                     throw new RuntimeException("encoderOutputBuffer " + encoderStatus + " was null");
@@ -368,7 +366,7 @@ public abstract class MediaEncoder implements Runnable {
                     // but MediaCodec#getOutputFormat can not call here(because INFO_OUTPUT_FORMAT_CHANGED don't come yet)
                     // therefor we should expand and prepare output format from buffer data.
                     // This sample is for API>=18(>=Android 4.3), just ignore this flag here
-                    mBufferInfo.size = 0;
+//                    mBufferInfo.size = 0;
                 }
 
                 if (mBufferInfo.size != 0) {
