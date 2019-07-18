@@ -93,15 +93,15 @@ public class MediaScreenEncoder extends MediaVideoEncoderBase {
     @Override
     public void stopRecording() {
         if (DEBUG) Log.v(TAG, "stopRecording:");
-        synchronized (mSync) {
+        synchronized (screenEncoderSync) {
             mIsRecording = false;
-            mSync.notifyAll();
+            screenEncoderSync.notifyAll();
         }
         super.stopRecording();
     }
 
 
-    private final Object mSync = new Object();
+    private final Object screenEncoderSync = new Object();
     private volatile boolean mIsRecording;
 
     private final ScreenCaptureTask mScreenCaptureTask = new ScreenCaptureTask(null, 0);
@@ -211,9 +211,16 @@ public class MediaScreenEncoder extends MediaVideoEncoderBase {
                     GLES20.glFlush();
                     frameAvailableSoon();
 
-                    synchronized (mSync) {
+                    synchronized (screenEncoderSync) {
+
                         try {
-                            mSync.wait(intervals - (System.currentTimeMillis() - startDraw));
+                            long waitTime = intervals - (System.currentTimeMillis() - startDraw);
+                            if (waitTime <= 0) {
+                                queueEvent(this);
+                            } else {
+                                screenEncoderSync.wait(waitTime);
+                                queueEvent(this);
+                            }
                         } catch (final InterruptedException e) {
                             return;
                         }
