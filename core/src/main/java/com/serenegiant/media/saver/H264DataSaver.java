@@ -3,7 +3,6 @@ package com.serenegiant.media.saver;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Environment;
-import android.util.Log;
 
 import com.serenegiant.media.BaseDataListener;
 
@@ -61,8 +60,9 @@ public class H264DataSaver extends BaseDataListener {
     public void writeFile(OutputStream out, ByteBuffer sourceData) throws IOException {
 
         byte[] outData = new byte[sourceData.limit()];
+        sourceData.mark();
         sourceData.get(outData);
-
+        sourceData.mark();
 //        Log.i("MediaEncoder", "length:" + outData.length+",date:" + bytesToHexFun3(outData));
         if(out == null){
             return;
