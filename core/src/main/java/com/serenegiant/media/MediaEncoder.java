@@ -44,7 +44,7 @@ public abstract class MediaEncoder implements Runnable {
         public void onStopped(MediaEncoder encoder);
     }
 
-    protected final Object mSync = new Object();
+    protected final Object encoderSync = new Object();
     /**
      * Flag that indicate this encoder is capturing now.
      */
@@ -92,13 +92,13 @@ public abstract class MediaEncoder implements Runnable {
         if (muxer == null) throw new NullPointerException("MP4DataSaver is null");
         mWeakMuxer = new WeakReference<DataListener>(muxer);
         mListener = listener;
-        synchronized (mSync) {
+        synchronized (encoderSync) {
             // create BufferInfo here for effectiveness(to reduce GC)
             mBufferInfo = new MediaCodec.BufferInfo();
             // wait for starting thread
             new Thread(this, getClass().getSimpleName()).start();
             try {
-                mSync.wait();
+                encoderSync.wait();
             } catch (final InterruptedException e) {
             }
         }
@@ -111,13 +111,13 @@ public abstract class MediaEncoder implements Runnable {
      * @return return true if encoder is ready to encod.
      */
     public boolean frameAvailableSoon() {
-//    	if (DEBUG) Log.v(TAG, "frameAvailableSoon");
-        synchronized (mSync) {
+
+        synchronized (encoderSync) {
             if (!mIsCapturing || mRequestStop) {
                 return false;
             }
             mRequestDrain++;
-            mSync.notifyAll();
+            encoderSync.notifyAll();
         }
         return true;
     }
@@ -128,16 +128,16 @@ public abstract class MediaEncoder implements Runnable {
     @Override
     public void run() {
 //		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-        synchronized (mSync) {
+        synchronized (encoderSync) {
             mRequestStop = false;
             mRequestDrain = 0;
-            mSync.notify();
+            encoderSync.notify();
         }
         final boolean isRunning = true;
         boolean localRequestStop;
         boolean localRequestDrain;
         while (isRunning) {
-            synchronized (mSync) {
+            synchronized (encoderSync) {
                 localRequestStop = mRequestStop;
                 localRequestDrain = (mRequestDrain > 0);
                 if (localRequestDrain)
@@ -156,9 +156,9 @@ public abstract class MediaEncoder implements Runnable {
             if (localRequestDrain) {
                 drain();
             } else {
-                synchronized (mSync) {
+                synchronized (encoderSync) {
                     try {
-                        mSync.wait();
+                        encoderSync.wait(0);
                     } catch (final InterruptedException e) {
                         break;
                     }
@@ -166,7 +166,7 @@ public abstract class MediaEncoder implements Runnable {
             }
         } // end of while
         if (DEBUG) Log.d(TAG, "Encoder thread exiting");
-        synchronized (mSync) {
+        synchronized (encoderSync) {
             mRequestStop = true;
             mIsCapturing = false;
         }
@@ -182,11 +182,11 @@ public abstract class MediaEncoder implements Runnable {
 
     public void startRecording() {
         if (DEBUG) Log.v(TAG, "startRecording");
-        synchronized (mSync) {
+        synchronized (encoderSync) {
             mIsCapturing = true;
             mRequestStop = false;
             mRequestPause = false;
-            mSync.notifyAll();
+            encoderSync.notifyAll();
         }
     }
 
@@ -195,12 +195,12 @@ public abstract class MediaEncoder implements Runnable {
      */
     public void stopRecording() {
         if (DEBUG) Log.v(TAG, "stopRecording");
-        synchronized (mSync) {
+        synchronized (encoderSync) {
             if (!mIsCapturing || mRequestStop) {
                 return;
             }
             mRequestStop = true;    // for rejecting newer frame
-            mSync.notifyAll();
+            encoderSync.notifyAll();
             // We can not know when the encoding and writing finish.
             // so we return immediately after request to avoid delay of caller thread
         }
@@ -208,19 +208,19 @@ public abstract class MediaEncoder implements Runnable {
 
     /*package*/ void pauseRecording() {
         if (DEBUG) Log.v(TAG, "pauseRecording");
-        synchronized (mSync) {
+        synchronized (encoderSync) {
             if (!mIsCapturing || mRequestStop) {
                 return;
             }
             mRequestPause = true;
             mLastPausedTimeUs = System.nanoTime() / 1000;
-            mSync.notifyAll();
+            encoderSync.notifyAll();
         }
     }
 
     /*package*/ void resumeRecording() {
         if (DEBUG) Log.v(TAG, "resumeRecording");
-        synchronized (mSync) {
+        synchronized (encoderSync) {
             if (!mIsCapturing || mRequestStop) {
                 return;
             }
@@ -229,7 +229,7 @@ public abstract class MediaEncoder implements Runnable {
                 mLastPausedTimeUs = 0;
             }
             mRequestPause = false;
-            mSync.notifyAll();
+            encoderSync.notifyAll();
         }
     }
 
@@ -350,12 +350,24 @@ public abstract class MediaEncoder implements Runnable {
                     // this never should come...may be a MediaCodec internal error
                     throw new RuntimeException("encoderOutputBuffer " + encoderStatus + " was null");
                 }
+
+                if (DEBUG)
+                    Log.d(TAG, "drain:buffer:size=" + mBufferInfo.size + ",offset=" + mBufferInfo.offset + ",presentationTimeUs=" + mBufferInfo.presentationTimeUs + ",flags=" + mBufferInfo.flags);
+                if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
+                    if (DEBUG) Log.d(TAG, "drain:buffer:BUFFER_FLAG_CODEC_CONFIG");
+                }
+                if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                    if (DEBUG) Log.d(TAG, "drain:buffer:BUFFER_FLAG_END_OF_STREAM");
+                }
+                if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_KEY_FRAME) != 0) {
+                    if (DEBUG) Log.d(TAG, "drain:buffer:BUFFER_FLAG_KEY_FRAME");
+                }
+
                 if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
                     // You should set output format to muxer here when you target Android4.3 or less
                     // but MediaCodec#getOutputFormat can not call here(because INFO_OUTPUT_FORMAT_CHANGED don't come yet)
                     // therefor we should expand and prepare output format from buffer data.
                     // This sample is for API>=18(>=Android 4.3), just ignore this flag here
-                    if (DEBUG) Log.d(TAG, "drain:BUFFER_FLAG_CODEC_CONFIG");
                     mBufferInfo.size = 0;
                 }
 
@@ -395,7 +407,7 @@ public abstract class MediaEncoder implements Runnable {
      */
     protected long getPTSUs() {
         long result;
-        synchronized (mSync) {
+        synchronized (encoderSync) {
             result = System.nanoTime() / 1000L - offsetPTSUs;
         }
         // presentationTimeUs should be monotonic
